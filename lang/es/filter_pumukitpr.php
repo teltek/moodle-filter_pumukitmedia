@@ -16,24 +16,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Strings for component 'filter_pumukitpr', language 'es'.
+ *
  * @package    filter_pumukitpr
  * @copyright  Teltek Video Research
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || exit();
-
-// FilterPumukitPR plugin version
-$plugin->version = 2021110801;
-
-// FilterPumukitPR moodle require version
-$plugin->requires = 2016112900;
-
-// FilterPumukitPR maturity
-$plugin->maturity = MATURITY_STABLE;
-
-// FilterPumukitPR plugin full name
-$plugin->component = 'filter_pumukitpr';
-
-// FilterPumukitPR release
-$plugin->release = '1';
+$string['filtername'] = 'Pumukit Personal Recorder filtro';
+$string['secret'] = 'PuMuKIT Personal Recorder contraseña';
+$string['secret_description'] = 'Moodle usará esta contraseña compartida para encriptar las consultas al servidor de PuMuKIT';
+$string['iframe_singlevideo_width'] = 'Ancho de vídeo monostream';
+$string['iframe_singlevideo_height'] = 'Alto de vídeo monostream';
+$string['iframe_multivideo_width'] = 'Ancho vídeo multistream';
+$string['iframe_multivideo_height'] = 'Alto vídeo multistream';
+$string['css_notvalid'] = "Valor no válido: Use un número seguido de una unidad ('px', 'em' or '%').";
