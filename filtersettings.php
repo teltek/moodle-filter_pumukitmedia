@@ -1,5 +1,6 @@
 <?php
 
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,15 +16,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
+/**
  * Administration settings definitions for the pumukitpr filter.
+ *
  * Settings can be accessed from:
  * Site Administration block -> Plugins -> Filters -> Pumukitpr filter
  * This form stores general settings into the site wide $CFG object.
  *
- * @copyright  2016
+ * @package    filter_pumukitpr
+ * @copyright  Teltek Video Research
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || exit;
 
 if (!class_exists('admin_setting_configtext_sizecss')) {
