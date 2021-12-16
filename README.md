@@ -2,6 +2,8 @@
 
 This filter will replace any link generated with pumukit repository with an iframe that will retrieve the content served by pumukit.
 
+[IMPORTANT] Before install this plugin installs [PuMuKIT Filter](https://github.com/teltek/moodle-filter_pumukitpr/)
+
 ## How to install
 
 ### Step 1: Download the latest code version from GitHub
