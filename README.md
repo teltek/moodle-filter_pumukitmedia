@@ -1,19 +1,19 @@
 # PuMuKIT Personal Recorder filter
 
-This filter will replace any link generated with pumukit repository with an iframe that will retrieve the content served by PuMuKIT.
+This filter will replace any link generated with PuMuKIT repository with an iframe that will retrieve the content served by PuMuKIT.
 
 ## How to install
 
-### Step 1: Download the latest code version from GitHub
+### Step 1: Clone the latest code version from GitHub
 ```
-https://github.com/teltek/moodle-filter_pumukitpr
+git clone https://github.com/teltek/moodle-filter_pumukitpr pumukitpr
 ```
 
 ### Step 2: Create .zip to install
 
 Move to downloaded folder and execute the following command.
 ```
-zip -r  moodle-filter_pumukitpr.zip moodle-filter_pumukitpr -x "moodle-filter_pumukitpr/.git/*" -x "moodle-filter_pumukitpr/.github/*" -x "moodle-filter_pumukitpr/.gitignore
+zip -r moodle-filter_pumukitpr.zip pumukitpr -x "pumukitpr/.git/*" -x "pumukitpr/.github/*" -x "pumukitpr/.gitignore"
 ```
 
 ### Step 3: Upload, configure and activate
