@@ -6,14 +6,14 @@ This filter will replace any link generated with PuMuKIT repository with an ifra
 
 ### Step 1: Clone the latest code version from GitHub
 ```
-git clone https://github.com/teltek/moodle-filter_pumukitpr pumukitpr
+git clone https://github.com/teltek/moodle-filter_pumukitmedia pumukitmedia
 ```
 
 ### Step 2: Create .zip to install
 
 Move to downloaded folder and execute the following command.
 ```
-zip -r moodle-filter_pumukitpr.zip pumukitpr -x "pumukitpr/.git/*" -x "pumukitpr/.github/*" -x "pumukitpr/.gitignore"
+zip -r moodle-filter_pumukitmedia.zip pumukitmedia -x "pumukitmedia/.git/*" -x "pumukitmedia/.github/*" -x "pumukitmedia/.gitignore"
 ```
 
 ### Step 3: Upload, configure and activate
