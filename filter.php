@@ -16,14 +16,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * PumukitPR link filtering
+ * pumukitmedia link filtering
  *
- * This filter will replace any link generated with atto_pumukitpr repository
- * with an iframe that will retrieve the content served by atto_pumukitpr.
+ * This filter will replace any link generated with atto_pumukitmedia repository
+ * with an iframe that will retrieve the content served by atto_pumukitmedia.
  *
  * It uses ideas from the media plugin filter and the helloworld filter template.
  *
- * @package    filter_pumukitpr
+ * @package    filter_pumukitmedia
  * @copyright  Teltek Video Research
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ defined('SECRET') || define('SECRET', 'ThisIsASecretPasswordChangeMe');
 
 require_once $CFG->libdir.'/filelib.php';
 
-class filter_pumukitpr extends moodle_text_filter
+class filter_pumukitmedia extends moodle_text_filter
 {
     public const PLAYLIST_SEARCH_REGEX = '/<iframe[^>]*?src=\"(https:\\/\\/[^>]*?\\/openedx\\/openedx\\/playlist\\/embed.*?)".*?>.*?<\\/iframe>/is';
     public const VIDEO_SEARCH_REGEX = '/<iframe[^>]*?src=\"(https:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)".*?>.*?<\\/iframe>/is';
@@ -51,7 +51,7 @@ class filter_pumukitpr extends moodle_text_filter
         if (filter_is_legacy_url($text)) {
             $parsedUrl = filter_convert_legacy_url($text);
             $search = (filter_is_a_playlist($parsedUrl)) ? self::LEGACY_PLAYLIST_SEARCH_REGEX : self::LEGACY_VIDEO_SEARCH_REGEX;
-            $iframe = preg_replace_callback($search, 'filter_pumukitpr_callback', $parsedUrl);
+            $iframe = preg_replace_callback($search, 'filter_pumukitmedia_callback', $parsedUrl);
             if (filter_validate_returned_iframe($text, $iframe)) {
                 return $iframe;
             }
@@ -59,7 +59,7 @@ class filter_pumukitpr extends moodle_text_filter
 
         if (filter_is_an_iframe($text)) {
             $search = (filter_is_a_playlist($text)) ? self::PLAYLIST_SEARCH_REGEX : self::VIDEO_SEARCH_REGEX;
-            $iframe = preg_replace_callback($search, 'filter_pumukitpr_openedx_callback', $text);
+            $iframe = preg_replace_callback($search, 'filter_pumukitmedia_openedx_callback', $text);
             if (filter_validate_returned_iframe($text, $iframe)) {
                 return $iframe;
             }
@@ -117,7 +117,7 @@ function filter_is_valid_text(string $text): bool
     return $isValidText;
 }
 
-function filter_pumukitpr_openedx_callback(array $link): string
+function filter_pumukitmedia_openedx_callback(array $link): string
 {
     global $CFG;
     //Get arguments from url.
@@ -143,7 +143,7 @@ function filter_pumukitpr_openedx_callback(array $link): string
     return str_replace($link[1], $url, $link[0]);
 }
 
-function filter_pumukitpr_callback(array $link): string
+function filter_pumukitmedia_callback(array $link): string
 {
     global $CFG;
     //Get arguments from url.
@@ -181,7 +181,7 @@ function filter_create_ticket($id, $email, $domain): string
 {
     global $CFG;
 
-    $secret = empty($CFG->filter_pumukitpr_secret) ? SECRET : $CFG->filter_pumukitpr_secret;
+    $secret = empty($CFG->filter_pumukitmedia_secret) ? SECRET : $CFG->filter_pumukitmedia_secret;
 
     $date = date('d/m/Y');
 

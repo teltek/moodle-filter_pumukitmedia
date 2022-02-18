@@ -16,24 +16,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    filter_pumukitpr
+ * @package    filter_pumukitmedia
  * @copyright  Teltek Video Research
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || exit();
 
-// FilterPumukitPR plugin version
-$plugin->version = 2022021701;
-
-// FilterPumukitPR moodle require version
+$plugin->version = 2022021801;
 $plugin->requires = 2016112900;
-
-// FilterPumukitPR maturity
 $plugin->maturity = MATURITY_STABLE;
-
-// FilterPumukitPR plugin full name
-$plugin->component = 'filter_pumukitpr';
-
-// FilterPumukitPR release
+$plugin->component = 'filter_pumukitmedia';
 $plugin->release = '1';

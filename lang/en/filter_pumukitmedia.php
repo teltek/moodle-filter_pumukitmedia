@@ -16,18 +16,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'filter_pumukitpr', language 'es'.
+ * Strings for component 'filter_pumukitmedia', language 'en'.
  *
- * @package    filter_pumukitpr
+ * @package    filter_pumukitmedia
  * @copyright  Teltek Video Research
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['filtername'] = 'Pumukit Personal Recorder filtro';
-$string['secret'] = 'PuMuKIT Personal Recorder contraseña';
-$string['secret_description'] = 'Moodle usará esta contraseña compartida para encriptar las consultas al servidor de PuMuKIT';
-$string['iframe_singlevideo_width'] = 'Ancho de vídeo monostream';
-$string['iframe_singlevideo_height'] = 'Alto de vídeo monostream';
-$string['iframe_multivideo_width'] = 'Ancho vídeo multistream';
-$string['iframe_multivideo_height'] = 'Alto vídeo multistream';
-$string['css_notvalid'] = "Valor no válido: Use un número seguido de una unidad ('px', 'em' or '%').";
+$string['filtername'] = 'Pumukit Personal Recorder filter';
+$string['secret'] = 'PuMuKIT Personal Recorder secret';
+$string['secret_description'] = 'Moodle will use this shared secret to encrypt queries to the pumukit server';
+$string['iframe_singlevideo_width'] = 'Single Video Width';
+$string['iframe_singlevideo_height'] = 'Single Video Height';
+$string['iframe_multivideo_width'] = 'Multi Video Width';
+$string['iframe_multivideo_height'] = 'Multi Video Height';
+$string['css_notvalid'] = "Value not valid: Use a number followed by an unit ('px', 'em' or '%').";
