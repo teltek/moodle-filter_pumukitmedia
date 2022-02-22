@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['filtername'] = 'Pumukit Personal Recorder filter';
-$string['secret'] = 'PuMuKIT Personal Recorder secret';
+$string['filtername'] = 'Pumukit Media filter';
+$string['secret'] = 'PuMuKIT Media filter secret';
 $string['secret_description'] = 'Moodle will use this shared secret to encrypt queries to the pumukit server';
 $string['iframe_singlevideo_width'] = 'Single Video Width';
 $string['iframe_singlevideo_height'] = 'Single Video Height';
