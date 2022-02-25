@@ -24,7 +24,7 @@ Upload moodle-filter_pumukitmedia.zip package and click in "Install plugin from 
 
 Follow the moodle instructions in the next sections until the configuration section.
 
-Configure the plugin with your [PuMuKIT data password] (https://github.com/teltek/PumukitLmsBundle/blob/master/Resources/doc/Configuration.md) and Save
+Configure the plugin with your [PuMuKIT data password](https://github.com/teltek/PumukitLmsBundle/blob/master/Resources/doc/Configuration.md) and Save
 
 Now, go to "Site administration" -> "Plugins" -> "Filters" -> "Manage filters"
 
