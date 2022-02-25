@@ -11,15 +11,21 @@ git clone https://github.com/teltek/moodle-filter_pumukitmedia pumukitmedia
 
 ### Step 2: Create .zip to install
 
-Move to downloaded folder and execute the following command.
+In the same folder where you do the last step execute the following command:
 ```
 zip -r moodle-filter_pumukitmedia.zip pumukitmedia -x "pumukitmedia/.git/*" -x "pumukitmedia/.github/*" -x "pumukitmedia/.gitignore"
 ```
 
 ### Step 3: Upload, configure and activate
 
-Upload .zip on Moodle -> Administration -> Plugins -> Install.
+Access to moodle as Administrator and go to "Site administration" -> "Plugins" -> "Install plugins"
 
-Configure the plugin with your [PuMuKIT data password](https://github.com/teltek/PumukitLmsBundle/blob/master/Resources/doc/Configuration.md)
+Upload moodle-filter_pumukitmedia.zip package and click in "Install plugin from the ZIP file". 
 
-Save and activate the filter, it will be ready to use.
+Follow the moodle instructions in the next sections until the configuration section.
+
+Configure the plugin with your [PuMuKIT data password] (https://github.com/teltek/PumukitLmsBundle/blob/master/Resources/doc/Configuration.md) and Save
+
+Now, go to "Site administration" -> "Plugins" -> "Filters" -> "Manage filters"
+
+Look for "Pumukit Media filter" and change it status from Disabled to On and it will be ready to use.
