@@ -1,5 +1,7 @@
 # PuMuKIT Media filter
 
+This filters should install with PuMuKIT (version 3.9 or lower).
+
 This filter will replace any link generated with PuMuKIT repository with an iframe that will retrieve the content served by PuMuKIT.
 
 ## How to install
