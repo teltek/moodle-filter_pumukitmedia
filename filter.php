@@ -45,7 +45,7 @@ class filter_pumukitmedia extends moodle_text_filter
         global $CFG;
 
         if (!filter_is_valid_text($text)) {
-            return $text;
+            return filter_replace_id_param($text);
         }
 
         if (filter_is_legacy_url($text)) {
@@ -53,7 +53,7 @@ class filter_pumukitmedia extends moodle_text_filter
             $search = (filter_is_a_playlist($parsedUrl)) ? self::LEGACY_PLAYLIST_SEARCH_REGEX : self::LEGACY_VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_callback', $parsedUrl);
             if (filter_validate_returned_iframe($text, $iframe)) {
-                return $iframe;
+                return filter_replace_id_param($iframe);
             }
         }
 
@@ -61,12 +61,27 @@ class filter_pumukitmedia extends moodle_text_filter
             $search = (filter_is_a_playlist($text)) ? self::PLAYLIST_SEARCH_REGEX : self::VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_openedx_callback', $text);
             if (filter_validate_returned_iframe($text, $iframe)) {
-                return $iframe;
+                return filter_replace_id_param($iframe);
             }
         }
 
-        return $text;
+        return filter_replace_id_param($text);
     }
+}
+
+function filter_replace_id_param(string $text): string
+{
+    $stringReplace = '';
+
+    if(-1 !== strpos('?id=', $text)) {
+        $stringReplace = '?id=';
+    }
+
+    if(-1 !== strpos('/?id=', $text)) {
+        $stringReplace = '/?id=';
+    }
+
+    return str_replace($stringReplace, '', $text);
 }
 
 function filter_convert_legacy_url(string $text): string
@@ -106,7 +121,7 @@ function filter_is_legacy_url(string $text): bool
 function filter_is_valid_text(string $text): bool
 {
     $isValidText = false;
-    if (is_string($text) && !empty($text)) {
+    if (!empty($text)) {
         $isValidText = true;
     }
 
@@ -125,20 +140,11 @@ function filter_pumukitmedia_openedx_callback(array $link): string
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
     //Initialized needed arguments.
-    $multistream = isset($link_params['multistream']) ? ('1' == $link_params['multistream']) : false;
     $mm_id = $link_params['id'] ?? null;
     if (!$mm_id) {
         $mm_id = $link_params['playlist'] ?? null;
     }
-    $email = $link_params['email'] ?? null;
-
-    $extra_arguments = [
-        'professor_email' => $email,
-        'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($link[1], PHP_URL_HOST)),
-    ];
-    $new_url_arguments = '?'.http_build_query(array_merge($extra_arguments, $link_params), '', '&');
-
-    $url = preg_replace('/(\\?.*)/i', $new_url_arguments, $link[1]);
+    $url = generateURL($link_params, $mm_id, $link[1]);
 
     return str_replace($link[1], $url, $link[0]);
 }
@@ -150,31 +156,35 @@ function filter_pumukitmedia_callback(array $link): string
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
     //Initialized needed arguments.
-    $multistream = isset($link_params['multistream']) ? ('1' == $link_params['multistream']) : false;
+    $multiStream = isset($link_params['multistream']) && '1' == $link_params['multistream'];
     $mm_id = $link_params['id'] ?? null;
-    $email = $link_params['email'] ?? null;
-    //Prepare new parameters.
-    $extra_arguments = [
-        'professor_email' => $email,
-        'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($link[1], PHP_URL_HOST)),
-    ];
-    $new_url_arguments = '?'.http_build_query(array_merge($extra_arguments, $link_params), '', '&');
-    //Create new url with ticket and correct email.
-    $url = preg_replace('/(\\?.*)/i', $new_url_arguments, $link[1]);
+    $url = generateURL($link_params, $mm_id, $link[1]);
     //Prepare and return iframe with correct sizes to embed on webpage.
-    if ($multistream) {
+    if ($multiStream) {
         $iframe_width = $CFG->iframe_multivideo_width ?: '100%';
         $iframe_height = $CFG->iframe_multivideo_height ?: '333px';
     } else {
         $iframe_width = $CFG->iframe_singlevideo_width ?: '592px';
         $iframe_height = $CFG->iframe_singlevideo_height ?: '333px';
     }
-    $iframe_html = '<iframe src="'.$url.'"'.
+    return '<iframe src="'.$url.'"'.
                    '        style="border:0px #FFFFFF none; width:'.$iframe_width.'; height:'.$iframe_height.';"'.
                    '        scrolling="no" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" >'.
                    '</iframe>';
+}
 
-    return $iframe_html;
+function generateURL(array $link_params, $mm_id, $url1)
+{
+    $email = $link_params['email'] ?? null;
+    //Prepare new parameters.
+    $extra_arguments = [
+        'professor_email' => $email,
+        'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($url1, PHP_URL_HOST)),
+    ];
+    $new_url_arguments = '?' . http_build_query(array_merge($extra_arguments, $link_params), '', '&');
+
+    //Create new url with ticket and correct email.
+    return preg_replace('/(\\?.*)/i', $new_url_arguments, $url1);
 }
 
 function filter_create_ticket($id, $email, $domain): string
