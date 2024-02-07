@@ -28,6 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 defined('MOODLE_INTERNAL') || exit();
 defined('SECRET') || define('SECRET', 'ThisIsASecretPasswordChangeMe');
 
@@ -42,46 +43,55 @@ class filter_pumukitmedia extends moodle_text_filter
 
     public function filter($text, array $options = []): string
     {
-        global $CFG;
-
+        // If the text does not contain any link or iframe, return the text as is.
         if (!filter_is_valid_text($text)) {
-            return filter_replace_id_param($text);
+            return $text;
         }
 
+        // Check if the text is a legacy url and convert it to the new format.
         if (filter_is_legacy_url($text)) {
             $parsedUrl = filter_convert_legacy_url($text);
             $search = (filter_is_a_playlist($parsedUrl)) ? self::LEGACY_PLAYLIST_SEARCH_REGEX : self::LEGACY_VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_callback', $parsedUrl);
             if (filter_validate_returned_iframe($text, $iframe)) {
-                return filter_replace_id_param($iframe);
+                return $iframe;
             }
         }
 
+        // Check if the text is an iframe and convert it to the new format.
         if (filter_is_an_iframe($text)) {
             $search = (filter_is_a_playlist($text)) ? self::PLAYLIST_SEARCH_REGEX : self::VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_openedx_callback', $text);
             if (filter_validate_returned_iframe($text, $iframe)) {
-                return filter_replace_id_param($iframe);
+                return $iframe;
             }
         }
 
-        return filter_replace_id_param($text);
+        return $text;
     }
 }
 
 function filter_replace_id_param(string $text): string
 {
-    $stringReplace = '';
-
-    if(-1 !== strpos('?id=', $text)) {
-        $stringReplace = '?id=';
-    }
-
-    if(-1 !== strpos('/?id=', $text)) {
-        $stringReplace = '/?id=';
+    $stringReplace = get_id_param($text);
+    if($stringReplace === null) {
+        return $text;
     }
 
     return str_replace($stringReplace, '', $text);
+}
+
+function get_id_param(string $text): ?string
+{
+    if(false !== strpos('?id=', $text)) {
+        return '?id=';
+    }
+
+    if(false !== strpos('/?id=', $text)) {
+        return '/?id=';
+    }
+
+    return null;
 }
 
 function filter_convert_legacy_url(string $text): string
@@ -92,6 +102,7 @@ function filter_convert_legacy_url(string $text): string
 
     return str_replace('pumoodle/embed', 'openedx/openedx/embed', $text);
 }
+
 
 function filter_validate_returned_iframe(string $oldText, string $newText): bool
 {
@@ -115,7 +126,7 @@ function filter_is_an_link(string $text): bool
 
 function filter_is_legacy_url(string $text): bool
 {
-    return false !== stripos($text, 'pumoodle');
+    return false !== stripos($text, 'pumoodle/');
 }
 
 function filter_is_valid_text(string $text): bool
@@ -134,30 +145,48 @@ function filter_is_valid_text(string $text): bool
 
 function filter_pumukitmedia_openedx_callback(array $link): string
 {
-    global $CFG;
-    //Get arguments from url.
-
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
-    //Initialized needed arguments.
+
+    $hasIdParam = get_id_param($link[1]);
+    if($hasIdParam === null) {
+        $urlElements = explode('/', $link[1]);
+        $mm_id = end($urlElements);
+        $url = generateURL($link_params, $mm_id, $link[1]);
+
+        return str_replace($link[1], $url, $link[0]);
+    }
+
     $mm_id = $link_params['id'] ?? null;
     if (!$mm_id) {
         $mm_id = $link_params['playlist'] ?? null;
     }
+
     $url = generateURL($link_params, $mm_id, $link[1]);
 
     return str_replace($link[1], $url, $link[0]);
 }
 
+
 function filter_pumukitmedia_callback(array $link): string
 {
     global $CFG;
-    //Get arguments from url.
+
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
-    //Initialized needed arguments.
+
+    $hasIdParam = get_id_param($link[1]);
+    if($hasIdParam === null) {
+        $urlElements = explode('/', $link[1]);
+        $mm_id = end($urlElements);
+        $url = generateURL($link_params, $mm_id, $link[1]);
+
+        return str_replace($link[1], $url, $link[0]);
+    }
+
     $multiStream = isset($link_params['multistream']) && '1' == $link_params['multistream'];
     $mm_id = $link_params['id'] ?? null;
+
     $url = generateURL($link_params, $mm_id, $link[1]);
     //Prepare and return iframe with correct sizes to embed on webpage.
     if ($multiStream) {
@@ -168,26 +197,23 @@ function filter_pumukitmedia_callback(array $link): string
         $iframe_height = $CFG->iframe_singlevideo_height ?: '333px';
     }
     return '<iframe src="'.$url.'"'.
-                   '        style="border:0px #FFFFFF none; width:'.$iframe_width.'; height:'.$iframe_height.';"'.
-                   '        scrolling="no" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" >'.
-                   '</iframe>';
+        '        style="border:0px #FFFFFF none; width:'.$iframe_width.'; height:'.$iframe_height.';"'.
+        '        scrolling="no" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" >'.
+        '</iframe>';
 }
 
-function generateURL(array $link_params, $mm_id, $url1)
+function generateURL(array $link_params, string $mm_id, string $url1): string
 {
     $email = $link_params['email'] ?? null;
-    //Prepare new parameters.
     $extra_arguments = [
         'professor_email' => $email,
         'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($url1, PHP_URL_HOST)),
     ];
-    $new_url_arguments = '?' . http_build_query(array_merge($extra_arguments, $link_params), '', '&');
 
-    //Create new url with ticket and correct email.
-    return preg_replace('/(\\?.*)/i', $new_url_arguments, $url1);
+    return $url1.'?'.http_build_query(array_merge($extra_arguments, $link_params));
 }
 
-function filter_create_ticket($id, $email, $domain): string
+function filter_create_ticket(string $id, string $email, string $domain): string
 {
     global $CFG;
 
