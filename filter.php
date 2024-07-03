@@ -40,9 +40,13 @@ class filter_pumukitmedia extends moodle_text_filter
     public const VIDEO_SEARCH_REGEX = '/<iframe[^>]*?src=\"(https:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)".*?>.*?<\\/iframe>/is';
     public const LEGACY_VIDEO_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)["\']>.*?<\\/a>/is';
     public const LEGACY_PLAYLIST_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/playlist\\/embed.*?)["\']>.*?<\\/a>/is';
+    public const VIDEO_DOMAIN_REGEX = '/<a[^>]+href="([^"]*)"[^>]*>.*?<\/a>/i';
+
 
     public function filter($text, array $options = []): string
     {
+        global $CFG;
+
         // If the text does not contain any link or iframe, return the text as is.
         if (!filter_is_valid_text($text)) {
             return $text;
@@ -67,18 +71,15 @@ class filter_pumukitmedia extends moodle_text_filter
             }
         }
 
+        if (filter_is_an_video_domain($text)) {
+            $iframe = preg_replace_callback(self::VIDEO_DOMAIN_REGEX, 'filter_pumukitmedia_video_domain_callback', $text);
+            if (filter_validate_returned_iframe($text, $iframe)) {
+                return $iframe;
+            }
+        }
+
         return $text;
     }
-}
-
-function filter_replace_id_param(string $text): string
-{
-    $stringReplace = get_id_param($text);
-    if($stringReplace === null) {
-        return $text;
-    }
-
-    return str_replace($stringReplace, '', $text);
 }
 
 function get_id_param(string $text): ?string
@@ -122,6 +123,11 @@ function filter_is_an_iframe(string $text): bool
 function filter_is_an_link(string $text): bool
 {
     return false !== stripos($text, '<a');
+}
+
+function filter_is_an_video_domain(string $text): bool
+{
+    return false !== stripos($text, 'http') && false !== stripos($text, 'video');
 }
 
 function filter_is_legacy_url(string $text): bool
@@ -170,8 +176,6 @@ function filter_pumukitmedia_openedx_callback(array $link): string
 
 function filter_pumukitmedia_callback(array $link): string
 {
-    global $CFG;
-
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
 
@@ -188,18 +192,20 @@ function filter_pumukitmedia_callback(array $link): string
     $mm_id = $link_params['id'] ?? null;
 
     $url = generateURL($link_params, $mm_id, $link[1]);
-    //Prepare and return iframe with correct sizes to embed on webpage.
-    if ($multiStream) {
-        $iframe_width = $CFG->iframe_multivideo_width ?: '100%';
-        $iframe_height = $CFG->iframe_multivideo_height ?: '333px';
-    } else {
-        $iframe_width = $CFG->iframe_singlevideo_width ?: '592px';
-        $iframe_height = $CFG->iframe_singlevideo_height ?: '333px';
+
+    return generate_iframe($url, $multiStream);
+}
+
+function filter_pumukitmedia_video_domain_callback(array $link): string
+{
+    global $CFG;
+
+    if (false === stripos($link[1], $CFG->pumukit_filter_domain)) {
+        return $link[1];
     }
-    return '<iframe src="'.$url.'"'.
-        '        style="border:0px #FFFFFF none; width:'.$iframe_width.'; height:'.$iframe_height.';"'.
-        '        scrolling="no" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" >'.
-        '</iframe>';
+
+    $url = str_replace('/video/', '/iframe/', $link[1]);
+    return generate_iframe($url, "");
 }
 
 function generateURL(array $link_params, string $mm_id, string $url1): string
@@ -222,4 +228,38 @@ function filter_create_ticket(string $id, string $email, string $domain): string
     $date = date('d/m/Y');
 
     return md5($email.$secret.$date.$domain);
+}
+
+function generate_iframe(string $url, string $isMultiStream): string
+{
+    $width = getIframeWidth($isMultiStream);
+    $height = getIframeHeight($isMultiStream);
+
+    return '<iframe src="'.$url.'"'.
+        '        style="border:0 #FFFFFF none; width:'.$width.'; height:'.$height.'; overflow: hidden"'.
+        '        allow="fullscreen">'.
+        '</iframe>';
+}
+
+
+function getIframeWidth(string $isMultiStream): string
+{
+    global $CFG;
+
+    if ($isMultiStream) {
+        return $CFG->iframe_multivideo_width ?: '100%';
+    }
+
+    return $CFG->iframe_singlevideo_width ?: '592px';
+}
+
+function getIframeHeight(string $isMultiStream): string
+{
+    global $CFG;
+
+    if ($isMultiStream) {
+        return $CFG->iframe_multivideo_height ?: '333px';
+    }
+
+    return $CFG->iframe_singlevideo_height ?: '333px';
 }

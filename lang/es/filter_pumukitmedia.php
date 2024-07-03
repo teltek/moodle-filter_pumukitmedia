@@ -31,3 +31,4 @@ $string['iframe_singlevideo_height'] = 'Alto de vídeo monostream';
 $string['iframe_multivideo_width'] = 'Ancho vídeo multistream';
 $string['iframe_multivideo_height'] = 'Alto vídeo multistream';
 $string['css_notvalid'] = "Valor no válido: Use un número seguido de una unidad ('px', 'em' or '%').";
+$string['pumukit_filter_domain'] = "Dominio permitido para agregar videos publicos de PuMuKIT";

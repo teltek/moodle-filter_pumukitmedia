@@ -88,4 +88,12 @@ if ($ADMIN->fulltree) {
         '333px',
         PARAM_INT
     ));
+
+    $settings->add(new admin_setting_configtext(
+        'pumukit_filter_domain',
+        get_string('pumukit_filter_domain', 'filter_pumukitmedia'),
+        '',
+        'pumukit.es',
+        PARAM_TEXT
+    ));
 }
