@@ -41,7 +41,7 @@ class filter_pumukitmedia extends moodle_text_filter
     public const LEGACY_VIDEO_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)["\']>.*?<\\/a>/is';
     public const LEGACY_PLAYLIST_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/playlist\\/embed.*?)["\']>.*?<\\/a>/is';
     public const VIDEO_DOMAIN_REGEX = '/<a[^>]+href="([^"]*)"[^>]*>.*?<\/a>/i';
-    public const MEDIA_LINK_REGEX = '/<a\b[^>]*\bclass=["\']?[^"\'>]*\bpumukit-media-link\b[^"\'>]*["\']?[^>]*>/i';
+    public const MEDIA_LINK_REGEX = '/<a[^>]+href="([^"]*)"(?:[^>]*\bclass="[^"]*\bpumukit-media-link\b[^"]*")?[^>]*>.*?<\/a>/i';
 
     public function filter($text, array $options = []): string
     {
