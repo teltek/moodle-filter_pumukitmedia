@@ -41,15 +41,20 @@ class filter_pumukitmedia extends moodle_text_filter
     public const LEGACY_VIDEO_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)["\']>.*?<\\/a>/is';
     public const LEGACY_PLAYLIST_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/playlist\\/embed.*?)["\']>.*?<\\/a>/is';
     public const VIDEO_DOMAIN_REGEX = '/<a[^>]+href="([^"]*)"[^>]*>.*?<\/a>/i';
-
+    public const MEDIA_LINK_REGEX = '/<a\b[^>]*\bclass=["\']?[^"\'>]*\bpumukit-media-link\b[^"\'>]*["\']?[^>]*>/i';
 
     public function filter($text, array $options = []): string
     {
-        global $CFG;
-
         // If the text does not contain any link or iframe, return the text as is.
         if (!filter_is_valid_text($text)) {
             return $text;
+        }
+
+        if(filter_is_an_media_link($text)) {
+            $iframe = preg_replace_callback(self::MEDIA_LINK_REGEX, 'filter_media_link_callback', $text);
+            if (filter_validate_returned_iframe($text, $iframe)) {
+                return $iframe;
+            }
         }
 
         // Check if the text is a legacy url and convert it to the new format.
@@ -62,7 +67,6 @@ class filter_pumukitmedia extends moodle_text_filter
             }
         }
 
-        // Check if the text is an iframe and convert it to the new format.
         if (filter_is_an_iframe($text)) {
             $search = (filter_is_a_playlist($text)) ? self::PLAYLIST_SEARCH_REGEX : self::VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_openedx_callback', $text);
@@ -84,11 +88,11 @@ class filter_pumukitmedia extends moodle_text_filter
 
 function get_id_param(string $text): ?string
 {
-    if(false !== strpos('?id=', $text)) {
+    if(false !== strpos($text, '?id=')) {
         return '?id=';
     }
 
-    if(false !== strpos('/?id=', $text)) {
+    if(false !== strpos($text, '/?id=')) {
         return '/?id=';
     }
 
@@ -108,6 +112,11 @@ function filter_convert_legacy_url(string $text): string
 function filter_validate_returned_iframe(string $oldText, string $newText): bool
 {
     return !empty($newText) && $newText !== $oldText;
+}
+
+function filter_is_an_media_link(string $text): bool
+{
+    return false !== stripos($text, 'pumukit-media-link');
 }
 
 function filter_is_a_playlist(string $text): bool
@@ -205,6 +214,22 @@ function filter_pumukitmedia_video_domain_callback(array $link): string
     }
 
     $url = str_replace('/video/', '/iframe/', $link[1]);
+    return generate_iframe($url, "");
+}
+
+function filter_media_link_callback(array $link): string
+{
+    $url = $link[1];
+    $regexParam = get_id_param($url);
+    if(null !== $regexParam) {
+        $params = explode($regexParam, $url);
+        $id = $params[1] ?? null;
+        if($regexParam === '/?id=') {
+            $url = $params[0].'/'.$id;
+        } else {
+            $url = $params[0].$id;
+        }
+    }
     return generate_iframe($url, "");
 }
 
