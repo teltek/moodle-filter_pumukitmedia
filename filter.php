@@ -222,7 +222,7 @@ function filter_media_link_callback(array $link): string
     $url = $link[1];
     $link_params = [];
     parse_str(html_entity_decode(parse_url($link[1], PHP_URL_QUERY)), $link_params);
-
+    $id = $link_params['id'];
     $regexParam = get_id_param($url);
     if(null !== $regexParam) {
         $params = explode($regexParam, $url);
@@ -234,7 +234,7 @@ function filter_media_link_callback(array $link): string
         }
     }
 
-    $url = generateURL($link_params, $link_params['id'] ?? null, $url);
+    $url = generateURL($link_params, $id, $url);
 
     return generate_iframe($url, "");
 }
