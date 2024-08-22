@@ -233,6 +233,10 @@ function filter_media_link_callback(array $link): string
             $url = $params[0].$id;
         }
     }
+    if ($id === null) {
+        $urlElements = explode('/', $url);
+        $id = end($urlElements);
+    }
 
     $url = generateURL($link_params, $id, $url);
 
