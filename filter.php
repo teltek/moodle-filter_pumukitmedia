@@ -270,10 +270,11 @@ function generate_iframe(string $url, string $isMultiStream): string
     $width = getIframeWidth($isMultiStream);
     $height = getIframeHeight($isMultiStream);
 
-    return '<iframe src="'.$url.'"'.
+    return '<div class="embed-responsive embed-responsive-16by9 tv-iframe">'.
+        '<iframe class="embed-responsive-item tv-iframe-item" src="'.$url.'"'.
         '        style="border:0 #FFFFFF none; width:'.$width.'; height:'.$height.'; overflow: hidden"'.
         '        allow="fullscreen">'.
-        '</iframe>';
+        '</iframe></div>';
 }
 
 
