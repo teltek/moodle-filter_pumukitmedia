@@ -251,7 +251,8 @@ function generateURL(array $link_params, string $mm_id, string $url1): string
         'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($url1, PHP_URL_HOST)),
     ];
 
-    return $url1.'?'.http_build_query(array_merge($extra_arguments, $link_params));
+    $finalURL = $url1.'?'.http_build_query(array_merge($extra_arguments, $link_params));
+    return checkAndValidateURL($finalURL);
 }
 
 function filter_create_ticket(string $id, string $email, string $domain): string
@@ -277,6 +278,15 @@ function generate_iframe(string $url, string $isMultiStream): string
         '</iframe></div>';
 }
 
+function checkAndValidateURL(string $url): string
+{
+    if(substr_count($url, '?') > 1) {
+        return $url;
+    }
+
+    $finalURL = preg_replace('/\?hash=/', '&hash=', $url);
+    return preg_replace('/&id=[^&]+/', '', $finalURL);
+}
 
 function getIframeWidth(string $isMultiStream): string
 {
