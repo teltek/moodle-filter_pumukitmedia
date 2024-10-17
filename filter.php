@@ -280,7 +280,7 @@ function generate_iframe(string $url, string $isMultiStream): string
 
 function checkAndValidateURL(string $url): string
 {
-    if(substr_count($url, '?') > 1) {
+    if(substr_count($url, '?') === 1) {
         return $url;
     }
 
