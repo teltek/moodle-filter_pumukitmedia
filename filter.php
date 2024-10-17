@@ -251,7 +251,7 @@ function generateURL(array $link_params, string $mm_id, string $url1): string
         'hash' => filter_create_ticket($mm_id, $email ?: '', parse_url($url1, PHP_URL_HOST)),
     ];
 
-    $finalURL = $url1.'?'.http_build_query(array_merge($extra_arguments, $link_params));
+    $finalURL = $url1.'?'.http_build_query(array_unique(array_merge($extra_arguments, $link_params)));
     return checkAndValidateURL($finalURL);
 }
 
@@ -284,8 +284,7 @@ function checkAndValidateURL(string $url): string
         return $url;
     }
 
-    $finalURL = preg_replace('/\?hash=/', '&hash=', $url);
-    return preg_replace('/&id=[^&]+/', '', $finalURL);
+    return preg_replace('/\?hash=/', '&hash=', $url);
 }
 
 function getIframeWidth(string $isMultiStream): string
