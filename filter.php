@@ -40,7 +40,6 @@ class filter_pumukitmedia extends moodle_text_filter
     public const VIDEO_SEARCH_REGEX = '/<iframe[^>]*?src=\"(https:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)".*?>.*?<\\/iframe>/is';
     public const LEGACY_VIDEO_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/embed.*?)["\']>.*?<\\/a>/is';
     public const LEGACY_PLAYLIST_SEARCH_REGEX = '/<a\\s[^>]*href=["\'](https?:\\/\\/[^>]*?\\/openedx\\/openedx\\/playlist\\/embed.*?)["\']>.*?<\\/a>/is';
-    public const VIDEO_DOMAIN_REGEX = '/<a[^>]+href="([^"]*)"[^>]*>.*?<\/a>/i';
     public const MEDIA_LINK_REGEX = '/<a[^>]+href="([^"]*)"(?:[^>]*\bclass="[^"]*\bpumukit-media-link\b[^"]*")?[^>]*>.*?<\/a>/i';
 
     public function filter($text, array $options = []): string
@@ -70,13 +69,6 @@ class filter_pumukitmedia extends moodle_text_filter
         if (filter_is_an_iframe($text)) {
             $search = (filter_is_a_playlist($text)) ? self::PLAYLIST_SEARCH_REGEX : self::VIDEO_SEARCH_REGEX;
             $iframe = preg_replace_callback($search, 'filter_pumukitmedia_openedx_callback', $text);
-            if (filter_validate_returned_iframe($text, $iframe)) {
-                return $iframe;
-            }
-        }
-
-        if (filter_is_an_video_domain($text)) {
-            $iframe = preg_replace_callback(self::VIDEO_DOMAIN_REGEX, 'filter_pumukitmedia_video_domain_callback', $text);
             if (filter_validate_returned_iframe($text, $iframe)) {
                 return $iframe;
             }
@@ -203,18 +195,6 @@ function filter_pumukitmedia_callback(array $link): string
     $url = generateURL($link_params, $mm_id, $link[1]);
 
     return generate_iframe($url, $multiStream);
-}
-
-function filter_pumukitmedia_video_domain_callback(array $link): string
-{
-    global $CFG;
-
-    if (false === stripos($link[1], $CFG->pumukit_filter_domain)) {
-        return $link[1];
-    }
-
-    $url = str_replace('/video/', '/iframe/', $link[1]);
-    return generate_iframe($url, "");
 }
 
 function filter_media_link_callback(array $link): string
