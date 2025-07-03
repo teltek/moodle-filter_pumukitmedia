@@ -23,8 +23,8 @@
 
 defined('MOODLE_INTERNAL') || exit();
 
-$plugin->version = 2024111400;
-$plugin->requires = 2016112900;
+$plugin->version = 2025070300;
+$plugin->requires = 2024051700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->component = 'filter_pumukitmedia';
-$plugin->release = '1.2.0';
+$plugin->release = '2.0.0';
