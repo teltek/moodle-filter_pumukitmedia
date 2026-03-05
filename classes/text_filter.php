@@ -203,7 +203,8 @@ function generateURL(array $link_params, string $mm_id, string $baseUrl): string
     ];
 
     $merged = array_merge($link_params, $extra);
-    return $baseUrl . '?' . http_build_query(array_unique($merged));
+    $base = strtok($baseUrl, '?');
+    return $base . '?' . http_build_query($merged);
 }
 
 function filter_create_ticket(string $id, string $email, string $domain): string
